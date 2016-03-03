@@ -23,7 +23,7 @@ public class NBTHelper {
 	}
 	
 	public static Map<String,NBTBase> getMap(NBTTagCompound tag){
-		return ReflectionHelper.getPrivateValue(NBTTagCompound.class, tag, 1);
+		return ReflectionHelper.getPrivateValue(NBTTagCompound.class, tag, 0);
 	}
 	
 	public static NBTBase getTagAt(NBTTagList tag, int index) {

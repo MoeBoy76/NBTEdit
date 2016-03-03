@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
@@ -42,13 +43,23 @@ public class ClientProxy extends CommonProxy {
 	}
 
 	@Override
-	public void openEditGUI(int entityID, NBTTagCompound tag) {
-		Minecraft.getMinecraft().displayGuiScreen(new GuiEditNBTTree(entityID, tag));
+	public void openEditGUI(final int entityID, final NBTTagCompound tag) {
+		Minecraft.getMinecraft().addScheduledTask(new Runnable() {
+			@Override
+			public void run() {
+				Minecraft.getMinecraft().displayGuiScreen(new GuiEditNBTTree(entityID, tag));
+			}
+		});
 	}
 	
 	@Override
-	public void openEditGUI(BlockPos pos, NBTTagCompound tag) {
-		Minecraft.getMinecraft().displayGuiScreen(new GuiEditNBTTree(pos, tag));
+	public void openEditGUI(final BlockPos pos, final NBTTagCompound tag) {
+		Minecraft.getMinecraft().addScheduledTask(new Runnable() {
+			@Override
+			public void run() {
+				Minecraft.getMinecraft().displayGuiScreen(new GuiEditNBTTree(pos, tag));
+			}
+		});
 	}
 
 	@SubscribeEvent
@@ -59,7 +70,7 @@ public class ClientProxy extends CommonProxy {
 			Entity e = screen.getEntity();
 			
 			if (e != null && e.isEntityAlive())
-				drawBoundingBox(event.context, event.partialTicks,e.getBoundingBox());
+				drawBoundingBox(event.context, event.partialTicks,e.getEntityBoundingBox());
 			else if (screen.isTileEntity()){
 				int x = screen.getBlockX();
 				int y = screen.y;
@@ -97,29 +108,29 @@ public class ClientProxy extends CommonProxy {
 		Tessellator tessellator = Tessellator.getInstance();
 		WorldRenderer worldRenderer = tessellator.getWorldRenderer();
 
-		worldRenderer.startDrawing(3);
-		worldRenderer.addVertex(aabb.minX, aabb.minY, aabb.minZ);
-		worldRenderer.addVertex(aabb.maxX, aabb.minY, aabb.minZ);
-		worldRenderer.addVertex(aabb.maxX, aabb.minY, aabb.maxZ);
-		worldRenderer.addVertex(aabb.minX, aabb.minY, aabb.maxZ);
-		worldRenderer.addVertex(aabb.minX, aabb.minY, aabb.minZ);
+		worldRenderer.begin(3, DefaultVertexFormats.POSITION_COLOR);
+		worldRenderer.pos(aabb.minX, aabb.minY, aabb.minZ);
+		worldRenderer.pos(aabb.maxX, aabb.minY, aabb.minZ);
+		worldRenderer.pos(aabb.maxX, aabb.minY, aabb.maxZ);
+		worldRenderer.pos(aabb.minX, aabb.minY, aabb.maxZ);
+		worldRenderer.pos(aabb.minX, aabb.minY, aabb.minZ);
 		tessellator.draw();
-		worldRenderer.startDrawing(3);
-		worldRenderer.addVertex(aabb.minX, aabb.maxY, aabb.minZ);
-		worldRenderer.addVertex(aabb.maxX, aabb.maxY, aabb.minZ);
-		worldRenderer.addVertex(aabb.maxX, aabb.maxY, aabb.maxZ);
-		worldRenderer.addVertex(aabb.minX, aabb.maxY, aabb.maxZ);
-		worldRenderer.addVertex(aabb.minX, aabb.maxY, aabb.minZ);
+		worldRenderer.begin(3, DefaultVertexFormats.POSITION_COLOR);
+		worldRenderer.pos(aabb.minX, aabb.maxY, aabb.minZ);
+		worldRenderer.pos(aabb.maxX, aabb.maxY, aabb.minZ);
+		worldRenderer.pos(aabb.maxX, aabb.maxY, aabb.maxZ);
+		worldRenderer.pos(aabb.minX, aabb.maxY, aabb.maxZ);
+		worldRenderer.pos(aabb.minX, aabb.maxY, aabb.minZ);
 		tessellator.draw();
-		worldRenderer.startDrawing(1);
-		worldRenderer.addVertex(aabb.minX, aabb.minY, aabb.minZ);
-		worldRenderer.addVertex(aabb.minX, aabb.maxY, aabb.minZ);
-		worldRenderer.addVertex(aabb.maxX, aabb.minY, aabb.minZ);
-		worldRenderer.addVertex(aabb.maxX, aabb.maxY, aabb.minZ);
-		worldRenderer.addVertex(aabb.maxX, aabb.minY, aabb.maxZ);
-		worldRenderer.addVertex(aabb.maxX, aabb.maxY, aabb.maxZ);
-		worldRenderer.addVertex(aabb.minX, aabb.minY, aabb.maxZ);
-		worldRenderer.addVertex(aabb.minX, aabb.maxY, aabb.maxZ);
+		worldRenderer.begin(1, DefaultVertexFormats.POSITION_COLOR);
+		worldRenderer.pos(aabb.minX, aabb.minY, aabb.minZ);
+		worldRenderer.pos(aabb.minX, aabb.maxY, aabb.minZ);
+		worldRenderer.pos(aabb.maxX, aabb.minY, aabb.minZ);
+		worldRenderer.pos(aabb.maxX, aabb.maxY, aabb.minZ);
+		worldRenderer.pos(aabb.maxX, aabb.minY, aabb.maxZ);
+		worldRenderer.pos(aabb.maxX, aabb.maxY, aabb.maxZ);
+		worldRenderer.pos(aabb.minX, aabb.minY, aabb.maxZ);
+		worldRenderer.pos(aabb.minX, aabb.maxY, aabb.maxZ);
 		tessellator.draw();
 
 		GlStateManager.depthMask(true);

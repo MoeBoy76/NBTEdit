@@ -6,6 +6,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ChatAllowedCharacters;
 
 import org.lwjgl.opengl.GL11;
@@ -549,11 +550,12 @@ public class GuiTextField extends Gui{
 		 GlStateManager.disableTexture2D();
 		 GlStateManager.enableColorLogic();
 		 GlStateManager.colorLogicOp(GL11.GL_OR_REVERSE);
-		 worldRenderer.startDrawingQuads();
-		 worldRenderer.addVertex((double)par1, (double)par4, 0.0D);
-		 worldRenderer.addVertex((double)par3, (double)par4, 0.0D);
-		 worldRenderer.addVertex((double)par3, (double)par2, 0.0D);
-		 worldRenderer.addVertex((double) par1, (double) par2, 0.0D);
+
+		 worldRenderer.begin(7, DefaultVertexFormats.POSITION_COLOR);
+		 worldRenderer.pos((double)par1, (double)par4, 0.0D);
+		 worldRenderer.pos((double)par3, (double)par4, 0.0D);
+		 worldRenderer.pos((double)par3, (double)par2, 0.0D);
+		 worldRenderer.pos((double) par1, (double) par2, 0.0D);
 		 tessellator.draw();
 		 GlStateManager.disableColorLogic();
 		 GlStateManager.enableTexture2D();

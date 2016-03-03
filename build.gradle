@@ -1,44 +1,44 @@
 buildscript {
     repositories {
-        mavenCentral()
+        jcenter()
         maven {
             name = "forge"
             url = "http://files.minecraftforge.net/maven"
         }
-        maven {
-            name = "sonatype"
-            url = "https://oss.sonatype.org/content/repositories/snapshots/"
-        }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT'
+    }
+}
+repositories {
+    mavenCentral()
+    maven {
+        name = "sonatype"
+        url 'http://oss.sonatype.org/content/repositories/snapshots'
     }
 }
 
-apply plugin: 'forge'
+apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "1.8-1.8.1"
+version = "1.8.9-1.0"
 group= "com.mcf.davidee.nbtedit"
 archivesBaseName = "NBTEdit"
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
-//Intellij sucks a bit with resources
-sourceSets.main { output.resourcesDir = output.classesDir }
+idea { module { inheritOutputDirs = true } }
+
 minecraft {
-    version = "1.8-11.14.1.1371"
-    mappings = 'stable_16'
+    version = "1.8.9-11.15.1.1722"
+    runDir = "run"
+    mappings = "stable_20"
+    //makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 }
 
 task deobfJar(type: Jar) {
     from sourceSets.main.output
     appendix = 'deobf'
-}
-
-task sourceJar(type: Jar) {
-    from sourceSets.main.allSource
-    appendix = 'src'
 }
 
 tasks.build.dependsOn('sourceJar', 'deobfJar')

@@ -64,7 +64,16 @@ public class PacketPipeline extends MessageToMessageCodec<FMLProxyPacket, Abstra
         AbstractPacket pkt = clazz.newInstance();
         pkt.decodeInto(ctx, payload.slice());
 
-        switch (FMLCommonHandler.instance().getEffectiveSide()) {
+        //FMLCommonHandler.instance().getEffectiveSide() doesn't take in to account Netty's new "Epoll" Thread name.
+        Side side;
+        Thread thr = Thread.currentThread();
+        if (FMLCommonHandler.instance().getSide() == Side.SERVER) side = Side.SERVER;
+        else if (thr.getName().equals("Server thread") || thr.getName().startsWith("Netty Server IO") || thr.getName().startsWith("Netty Epoll Server IO")) {
+            side = Side.SERVER;
+        } else side = Side.CLIENT;
+
+        //switch (FMLCommonHandler.instance().getEffectiveSide()) {
+        switch (side) {
             case CLIENT:
                 pkt.handleClientSide(this.getClientPlayer());
                 break;

@@ -33,7 +33,7 @@ public class NBTEdit {
 
 	public static final String MODID = "NBTEdit";
 	public static final String NAME = "In-game NBTEdit";
-	public static final String VERSION = "1.7.10-1.0";
+	public static final String VERSION = "1.8.9-1.0";
 
 	private static final String SEP = System.getProperty("line.separator");
 	public static final NBTNodeSorter SORTER = new NBTNodeSorter();

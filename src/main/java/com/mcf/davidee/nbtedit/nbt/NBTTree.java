@@ -53,7 +53,8 @@ public class NBTTree {
 	
 	
 	private void construct() {
-		root = new Node<>(new NamedNBT("ROOT", (NBTTagCompound)baseTag.copy()));
+		root = new Node<>(new NamedNBT("ROOT", baseTag.copy()));
+		root.setDrawChildren(true);
 		addChildrenToTree(root);
 		sort(root);
 	}

@@ -1,5 +1,6 @@
 package com.mcf.davidee.nbtedit.gui;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -14,6 +15,7 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiControls;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -328,13 +330,14 @@ public class GuiNBTTree extends Gui{
 		mc.renderEngine.bindTexture(optionsBackground);
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 		float var6 = 32.0F;
-		worldRenderer.startDrawingQuads();
-		worldRenderer.setColorRGBA_I(4210752, par4);
-		worldRenderer.addVertexWithUV(0.0D, (double)par2, 0.0D, 0.0D, (double)((float)par2 / var6));
-		worldRenderer.addVertexWithUV((double)this.width, (double)par2, 0.0D, (double)((float)this.width / var6), (double)((float)par2 / var6));
-		worldRenderer.setColorRGBA_I(4210752, par3);
-		worldRenderer.addVertexWithUV((double)this.width, (double)par1, 0.0D, (double)((float)this.width / var6), (double)((float)par1 / var6));
-		worldRenderer.addVertexWithUV(0.0D, (double)par1, 0.0D, 0.0D, (double)((float)par1 / var6));
+		worldRenderer.begin(7, DefaultVertexFormats.POSITION_COLOR);
+		Color color = new Color(4210752);
+		worldRenderer.color(color.getRed(), color.getGreen(), color.getBlue(), par4);
+		worldRenderer.pos(0.0D, (double)par2, 0.0D).tex(0.0D, (double)((float)par2 / var6));
+		worldRenderer.pos((double)this.width, (double)par2, 0.0D).tex ((double)((float)this.width / var6), (double)((float)par2 / var6));
+		worldRenderer.color(color.getRed(), color.getGreen(), color.getBlue(), par3);
+		worldRenderer.pos((double)this.width, (double)par1, 0.0D).tex ((double)((float)this.width / var6), (double)((float)par1 / var6));
+		worldRenderer.pos(0.0D, (double)par1, 0.0D).tex(0.0D, (double)((float)par1 / var6));
 		tessellator.draw();
 	}
 
@@ -738,6 +741,16 @@ public class GuiNBTTree extends Gui{
 				break;
 			}
 		}
+	}
+
+	private void putColor(WorldRenderer renderer, int argb, int p_178988_2_)
+	{
+		int i = renderer.getColorIndex(p_178988_2_);
+		int j = argb >> 16 & 255;
+		int k = argb >> 8 & 255;
+		int l = argb & 255;
+		int i1 = argb >> 24 & 255;
+		renderer.putColorRGBA(i, j, k, l, i1);
 	}
 
 }
