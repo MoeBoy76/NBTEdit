@@ -1,30 +1,5 @@
 package com.mcf.davidee.nbtedit.gui;
 
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.logging.Level;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.PositionedSoundRecord;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiControls;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
-
 import com.mcf.davidee.nbtedit.NBTEdit;
 import com.mcf.davidee.nbtedit.NBTHelper;
 import com.mcf.davidee.nbtedit.NBTStringHelper;
@@ -32,6 +7,26 @@ import com.mcf.davidee.nbtedit.nbt.NBTTree;
 import com.mcf.davidee.nbtedit.nbt.NamedNBT;
 import com.mcf.davidee.nbtedit.nbt.Node;
 import com.mcf.davidee.nbtedit.nbt.SaveStates;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.PositionedSoundRecord;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiControls;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.init.SoundEvents;
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import org.apache.logging.log4j.Level;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
+
+import java.awt.*;
+import java.util.*;
+import java.util.List;
+import java.util.Map.Entry;
 
 
 /*
@@ -44,7 +39,7 @@ import com.mcf.davidee.nbtedit.nbt.SaveStates;
  *    - Naive/unoptimized - layout changes force an entire reload of the tree
  *    - Messy, good luck. Some of the button IDs are hardcoded.
  */
-public class GuiNBTTree extends Gui{
+public class GuiNBTTree extends Gui {
 
 	private Minecraft mc = Minecraft.getMinecraft();
 
@@ -326,8 +321,8 @@ public class GuiNBTTree extends Gui{
 	protected void overlayBackground(int par1, int par2, int par3, int par4)
 	{
 		Tessellator tessellator = Tessellator.getInstance();
-		WorldRenderer worldRenderer = tessellator.getWorldRenderer();
-		mc.renderEngine.bindTexture(optionsBackground);
+		VertexBuffer worldRenderer = tessellator.getBuffer();
+		mc.renderEngine.bindTexture(OPTIONS_BACKGROUND);
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 		float var6 = 32.0F;
 		worldRenderer.begin(7, DefaultVertexFormats.POSITION_COLOR);
@@ -364,7 +359,7 @@ public class GuiNBTTree extends Gui{
 					if (button.inBoundsOfX(mx, my)){
 						button.reset();
 						NBTEdit.getSaveStates().save();
-						mc.getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1.0F));
+						mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
 						return;
 					}
 					if (button.inBounds(mx, my)){
@@ -412,19 +407,19 @@ public class GuiNBTTree extends Gui{
 				button.save.tag.setTag(name, base.copy());
 			button.saved();
 			NBTEdit.getSaveStates().save();
-			mc.getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1.0F));
+			mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
 		}
 		else{ //Paste into
 			Map<String, NBTBase> nbtMap = NBTHelper.getMap(button.save.tag);
 			if (nbtMap.isEmpty()){
-				NBTEdit.log(Level.WARNING, "Unable to copy from save \"" + button.save.name +"\".");
-				NBTEdit.log(Level.WARNING, "The save is invalid - a valid save must only contain 1 core NBTBase");
+				NBTEdit.log(Level.WARN, "Unable to copy from save \"" + button.save.name +"\".");
+				NBTEdit.log(Level.WARN, "The save is invalid - a valid save must only contain 1 core NBTBase");
 			}
 			else{
 				if (focused == null)
 					setFocused(tree.getRoot());
 				
-				Entry<String, NBTBase> firstEntry =  (Entry<String, NBTBase>) nbtMap.entrySet().toArray()[0];
+				Entry<String, NBTBase> firstEntry =  nbtMap.entrySet().iterator().next();
 				assert firstEntry != null;
 				String name = firstEntry.getKey();
 				NBTBase nbt = firstEntry.getValue().copy();
@@ -432,7 +427,7 @@ public class GuiNBTTree extends Gui{
 					setFocused(null);
 					tree = new NBTTree((NBTTagCompound)nbt);
 					initGUI();
-					mc.getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1.0F));
+					mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
 				}
 				else if (canAddToParent(focused.getObject().getNBT(), nbt)){
 					focused.setDrawChildren(true);
@@ -447,7 +442,7 @@ public class GuiNBTTree extends Gui{
 					tree.sort(node);
 					setFocused(node);
 					initGUI(true);
-					mc.getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1.0F));
+					mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
 				}
 			}
 		}
@@ -743,7 +738,7 @@ public class GuiNBTTree extends Gui{
 		}
 	}
 
-	private void putColor(WorldRenderer renderer, int argb, int p_178988_2_)
+	private void putColor(VertexBuffer renderer, int argb, int p_178988_2_)
 	{
 		int i = renderer.getColorIndex(p_178988_2_);
 		int j = argb >> 16 & 255;

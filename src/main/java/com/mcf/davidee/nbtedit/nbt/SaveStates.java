@@ -1,13 +1,12 @@
 package com.mcf.davidee.nbtedit.nbt;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.logging.Level;
-
 import com.mcf.davidee.nbtedit.NBTEdit;
-
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
+import org.apache.logging.log4j.Level;
+
+import java.io.File;
+import java.io.IOException;
 
 // This save format can definitely be improved. Also, this can be extended to provide infinite save slots - just
 // need to add some scrollbar (use GuiLib!).
@@ -48,10 +47,10 @@ public class SaveStates {
 	public void save(){
 		try {
 			write();
-			NBTEdit.log(Level.FINE,"NBTEdit saved successfully.");
+			NBTEdit.log(Level.TRACE,"NBTEdit saved successfully.");
 		}
 		catch(IOException e){
-			NBTEdit.log(Level.WARNING, "Unable to write NBTEdit save.");
+			NBTEdit.log(Level.WARN, "Unable to write NBTEdit save.");
 			NBTEdit.throwing("SaveStates", "save", e);
 		}
 	}
@@ -59,10 +58,10 @@ public class SaveStates {
 	public void load(){
 		try {
 			read();
-			NBTEdit.log(Level.FINE,"NBTEdit save loaded successfully.");
+			NBTEdit.log(Level.TRACE,"NBTEdit save loaded successfully.");
 		}
 		catch(IOException e){
-			NBTEdit.log(Level.WARNING, "Unable to read NBTEdit save.");
+			NBTEdit.log(Level.WARN, "Unable to read NBTEdit save.");
 			NBTEdit.throwing("SaveStates", "load", e);
 		}
 	}

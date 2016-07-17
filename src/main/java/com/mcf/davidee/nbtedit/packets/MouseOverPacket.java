@@ -1,49 +1,40 @@
 package com.mcf.davidee.nbtedit.packets;
 
-import static com.mcf.davidee.nbtedit.NBTEdit.SECTION_SIGN;
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
-
-import java.io.IOException;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.MovingObjectPosition.MovingObjectType;
-
 import com.mcf.davidee.nbtedit.NBTEdit;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class MouseOverPacket extends AbstractPacket {
-	
-	@Override
-	public void encodeInto(ChannelHandlerContext ctx, ByteBuf buffer) throws IOException {
+public class MouseOverPacket implements IMessage {
 
-	}
-
-	@Override
-	public void decodeInto(ChannelHandlerContext ctx, ByteBuf buffer) throws IOException {
-
-	}
-
-	@Override
-	public void handleClientSide(EntityPlayer player) {
-		MovingObjectPosition pos = Minecraft.getMinecraft().objectMouseOver;
-		AbstractPacket packet = null;
-		if (pos != null)
-			if (pos.entityHit != null)
-				packet = new EntityRequestPacket(pos.entityHit.getEntityId());
-			else if (pos.typeOfHit == MovingObjectType.BLOCK)
-				packet = new TileRequestPacket(pos.getBlockPos());
-		if (packet == null) 
-			sendMessageToPlayer(player, SECTION_SIGN + "cError - No tile or entity selected");
-		else
-			NBTEdit.DISPATCHER.sendToServer(packet);
-	}
+	/** Required default constructor. */
+	public MouseOverPacket() {}
 
 	@Override
-	public void handleServerSide(EntityPlayerMP player) {
-		
-	}
+	public void fromBytes(ByteBuf buf) {}
 
+	@Override
+	public void toBytes(ByteBuf buf) {}
+
+	public static class Handler implements IMessageHandler<MouseOverPacket, IMessage> {
+
+		@Override
+		public IMessage onMessage(MouseOverPacket message, MessageContext ctx) {
+			RayTraceResult pos = Minecraft.getMinecraft().objectMouseOver;
+			if (pos != null) {
+				if (pos.entityHit != null) {
+					return new EntityRequestPacket(pos.entityHit.getEntityId());
+				} else if (pos.typeOfHit == RayTraceResult.Type.BLOCK) {
+					return new TileRequestPacket(pos.getBlockPos());
+				} else {
+					NBTEdit.proxy.sendMessage(null, "Error - No tile or entity selected", TextFormatting.RED);
+				}
+			}
+			return null;
+		}
+	}
 }
